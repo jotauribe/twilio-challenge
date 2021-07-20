@@ -1,0 +1,8 @@
+node_modules
+/coverage
+/docs
+/dist
+/.temp
+/.idea
+/.vscode
+.env

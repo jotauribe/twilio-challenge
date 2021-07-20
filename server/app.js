@@ -1,23 +1,21 @@
-import express from "express";
-// import axios from "axios";
+import express from 'express';
+
+import friendsRepository from './repositories/friends.repository';
+import playsRepositoriy from './repositories/plays.repositoriy';
+import { unique } from './utils';
 
 const app = express();
 
-app.get(
-  [
-    // ignore; endpoint for easily viewing the default server
-    // response on CodeSandbox
-    "/",
-    // endpoint initially used by the React app
-    "/api/test-endpoint"
-  ],
-  (req, res) => {
-    res.status(200).json({ test: "hello world!" });
-  }
-);
+app.get('/api/users/:username', async (req, res) => {
+  const { username } = req.params;
+  const [friends, plays] = await Promise.all([
+    friendsRepository.getFriends(username),
+    playsRepositoriy.getPlayHistory(username),
+  ]);
 
-app.get("/api/users/:username", async (req, res) => {
-  // your code here!
+  const uri = `users/${username}`;
+  const tracks = unique(plays);
+  res.send({ username, plays: plays.length, friends: friends.length, tracks, uri });
 });
 
 export default app;
