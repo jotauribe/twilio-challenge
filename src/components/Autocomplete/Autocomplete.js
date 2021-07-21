@@ -1,13 +1,17 @@
 import React from 'react';
 import './Autocomplete.styles.css';
+import { useBooleanRef } from '../../hooks';
 
-const getVisibleOptions = (options, value) =>
-  !value ? options : options.filter((o) => o.label?.includes?.(value));
+const getVisibleOptions = (options = [], value) => {
+  if (!value) return options;
+  return options?.filter(o => o.label?.includes?.(value) && o.label !== value);
+};
 
 export default function Autocomplete({ value, options = [], onChange }) {
   const [focused, setFocused] = React.useState(false);
+  const [ignoreBlur, setIgnoreBlur] = useBooleanRef(false);
   const onFocus = () => setFocused(true);
-  const onBlur = () => setFocused(false);
+  const onBlur = () => !ignoreBlur.current && setFocused(false);
 
   const visibleOptions = getVisibleOptions(options, value);
   const isMenuOpen = focused && value && visibleOptions?.length > 0;
@@ -22,15 +26,24 @@ export default function Autocomplete({ value, options = [], onChange }) {
         onFocus={onFocus}
         onChange={(event) => onChange(event?.target?.value)}
       />
-      {isMenuOpen && (
-        <div className="options">
-          {visibleOptions.map((o) => (
-            <div className="option" onClick={() => onChange(o.label)}>
+
+      <div
+        className="options"
+        onTouchStart={() => setIgnoreBlur(true)}
+        onMouseEnter={() => setIgnoreBlur(true)}
+        onMouseLeave={() => setIgnoreBlur(false)}
+      >
+        {isMenuOpen &&
+          visibleOptions.map((o) => (
+            <div
+              key={o.value}
+              className="option"
+              onClick={() => (setIgnoreBlur(false), onChange(o.label))}
+            >
               {o.label}
             </div>
           ))}
-        </div>
-      )}
+      </div>
     </div>
   );
 }
