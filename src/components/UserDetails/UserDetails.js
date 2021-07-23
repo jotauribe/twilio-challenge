@@ -11,7 +11,7 @@ export default function UserDetails({ user }) {
   
     return (
       <div className="container">
-        {users ? (
+        {user ? (
           <ReactJson src={user} collapsed={1} />
         ) : (
           <h1>Loading... please wait!</h1>

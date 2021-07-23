@@ -1,7 +1,7 @@
 import React from "react";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 
 import MainContent from "../MainContent";
 
@@ -18,7 +18,9 @@ afterAll(() => server.close());
 
 describe("MainContent", () => {
   test("loads and displays greeting", async () => {
-    render(<MainContent />);
+    await act(async () => {
+      await render(<MainContent />);
+    })
 
     expect(screen.getByText("Loading... please wait!")).toBeDefined();
   });
